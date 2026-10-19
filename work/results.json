@@ -1,0 +1,44 @@
+[
+  {
+    "test": "T1_startup_state",
+    "status": "PASS",
+    "seconds": 0.01,
+    "evidence": "server=effectcraft/0.12.0 proto=2025-03-26; state: {\"app\": {\"commands\": 731, \"effects\": {\"float\": 307, \"gpu\": 280, \"total\": 307}, \"export\": [\"H264\", \"Hevc\", \"Av1\", \"ProRes\", \"Uncompressed\", \"WebM\", \"PngSequence\", \"JpegSequence\", \"TiffSequence\", \"ExrSequence\", \"Gif\", \"Wav\", \"Aiff\"], \"expressions\": true, \"gpu\": false, \"import\": true, \"parity\": {\"doc\": \"docs/target-app-parity.md\", \"summary\": \"\\u224891"
+  },
+  {
+    "test": "T2_composition_layers",
+    "status": "PASS",
+    "seconds": 0.01,
+    "evidence": "comp=1920x1080@30.0/5.0s layers=['Title', 'BG'] ids=[905, 882]; comp.new reply: {\"comp\": 880}"
+  },
+  {
+    "test": "T3_keyframes",
+    "status": "PASS",
+    "seconds": 0.01,
+    "evidence": "position keys=2 opacity keys=2 easyEase accepted; get_property keys=[{\"compTime\": 0.0, \"in\": \"Bezier\", \"layerTime\": 0.0, \"out\": \"Bezier\", \"time\": 0.0, \"value\": [-300.0, 540.0, 0.0]}, {\"compTime\": 2.0, \"in\": \"Bezier\", \"layerTime\": 2.0, \"out\": \"Bezier\", \"time\": 2.0, \"value\": [960.0, 540.0, 0.0]}]"
+  },
+  {
+    "test": "T4_effects",
+    "status": "PASS",
+    "seconds": 0.01,
+    "evidence": "applied 'Gaussian Blur' (reply {\"index\": 1, \"layer\": 905, \"name\": \"Gaussian Blur\", \"params\": [{\"path\": \"effects/#1/blurriness\", \"type\": \"scalar\", \"value\": 0.0}, {\"path\": \"), blurriness=12, confirmed in get_layer"
+  },
+  {
+    "test": "T5_render_queue",
+    "status": "PASS",
+    "seconds": 13.32,
+    "evidence": "h264 written: /home/z/my-project/ec-gauntlet/gauntlet-repo/work/gauntlet_render.mp4 520601 bytes (0.52 MB), wall 13.3s; /home/z/my-project/ec-gauntlet/gauntlet-repo/work/gauntlet_render.mp4: ISO Media, MP4 Base Media v1 [ISO 14496-12:2003]"
+  },
+  {
+    "test": "T6_fonts",
+    "status": "PASS",
+    "seconds": 0.03,
+    "evidence": "Inter listed (origin=bundled; bundled => not probative); Grenze listed via EFFECTCRAFT_FONT_DIRS (origin=system); Grenze text layer created; font_probe.png 20352 bytes"
+  },
+  {
+    "test": "T7_error_recovery",
+    "status": "PASS",
+    "seconds": 0.0,
+    "evidence": "structured rejection, server alive after; error: invalid parameters for `prop.set`: no property `transform/fake_property`"
+  }
+]

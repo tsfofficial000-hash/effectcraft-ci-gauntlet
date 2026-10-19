@@ -1,0 +1,74 @@
+name: MCP Gauntlet
+
+on:
+  workflow_dispatch:
+
+jobs:
+  gauntlet:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      EFFECTCRAFT_FONT_DIRS: /ci-fonts
+      GAUNTLET_CLI: ${{ github.workspace }}/effectcraft/target/release/effectcraft-cli
+      GAUNTLET_WORKDIR: ${{ github.workspace }}/work
+    steps:
+      - name: Checkout gauntlet harness
+        uses: actions/checkout@v4
+
+      - name: Checkout effectcraft (pinned to recon-time HEAD ef74d829)
+        uses: actions/checkout@v4
+        with:
+          repository: storytold/effectcraft
+          ref: ef74d82902ba486891b02afa87e42963cc9b84cc
+          path: effectcraft
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: effectcraft
+
+      - name: Install Inter + Grenze (control font) into /ci-fonts
+        run: |
+          sudo mkdir -p /ci-fonts
+          sudo chown -R $USER:$USER /ci-fonts
+          echo "== fc-list pre-check: Grenze must NOT already exist on the runner =="
+          if fc-list : family | grep -qi grenze; then
+            echo "WARNING: Grenze already present on runner - control font tainted, T6 result must be interpreted accordingly"
+          else
+            echo "OK: Grenze absent from runner image before install"
+          fi
+          curl -sL -o /tmp/inter.zip https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip
+          mkdir -p /tmp/inter
+          unzip -q /tmp/inter.zip -d /tmp/inter
+          find /tmp/inter \( -name '*.ttf' -o -name '*.otf' \) -exec cp {} /ci-fonts/ \;
+          curl -sL -o '/ci-fonts/Grenze[wght].ttf' 'https://raw.githubusercontent.com/google/fonts/main/ofl/grenze/Grenze%5Bwght%5D.ttf'
+          file '/ci-fonts/Grenze[wght].ttf'
+          echo "fonts in /ci-fonts:"; ls /ci-fonts | head -20
+          fc-cache -f 2>/dev/null || true
+
+      - name: Build effectcraft-cli (release)
+        working-directory: effectcraft
+        run: |
+          cargo build --release -p effectcraft-cli 2>&1 | tail -5
+          ls -la target/release/effectcraft-cli
+
+      - name: Run MCP gauntlet (Tests 1-7)
+        run: |
+          mkdir -p work
+          python3 gauntlet_test.py
+
+      - name: Upload artifacts (test-render-output + logs)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-render-output
+          path: |
+            work/gauntlet_render.*
+            work/results.json
+            work/gauntlet.log
+            work/server_stderr.log
+            work/font_probe.png
+          if-no-files-found: warn
